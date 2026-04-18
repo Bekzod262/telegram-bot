@@ -1,2 +1,2 @@
 # my---first---bot
-MY First PYTHON BOT
+MY First PYTHON BOt
