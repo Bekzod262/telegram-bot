@@ -1,8 +1,10 @@
-n = int(input("N sonini kiriting: "))
+while True:
+    a = int(input("1 - son: "))
+    b = int(input("2 - son: "))
 
-sanoq = 0
+    print("Natija:", a+b )
 
-for i in range(1, n+1):
-    if i%2 == 0:
-        sanoq += i
-print(sanoq)
+    javob = input("Yana davom atasizmi (ha / yoq):")
+
+    if javob == "yoq":
+        break
