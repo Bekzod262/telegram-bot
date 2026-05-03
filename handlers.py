@@ -1,10 +1,10 @@
-while True:
-    a = int(input("1 - son: "))
-    b = int(input("2 - son: "))
+sanoq = 0
 
-    print("Natija:", a+b )
+son = int(input("Son kiriting: "))
 
-    javob = input("Yana davom atasizmi (ha / yoq):")
+while son != 0:
+    if son < 0:
+        sanoq  += 1
+    son = int(input("Son kiriting: "))
 
-    if javob == "yoq":
-        break
+print(sanoq)
