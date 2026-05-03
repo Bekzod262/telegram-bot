@@ -1,6 +1,9 @@
 import telebot
+import os
+from dotenv import load_dotenv
 
-TOKEN = "TOKENINGNI_BU_YERGA_QO'Y"
+load_dotenv()
+TOKEN =os.getenv("TOKEN")
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -15,7 +18,7 @@ def handler(message):
     text = message.text
     if text == "1":
 
-bot.send_message(message.chat.id, "Subhanalloh")
+        bot.send_message(message.chat.id, "Subhanalloh")
 
     elif text == "2":
 
@@ -23,25 +26,25 @@ bot.send_message(message.chat.id, "Subhanalloh")
     elif text == "3":
         bot.send_message(message.chat.id,"Allohu Akbar")
     
-    elif text = "4":
+    elif text == "4":
         bot.send_message(message.chat.id,"La ilaha illaloh")
     
-    elif text = "5":
+    elif text == "5":
         bot.send_message(message.chat.id,"Astaghfirulloh")
     
-    elif text = "6":
+    elif text == "6":
         bot.send_message(message.chat.id,"Subhanallohi va bihamdihi")
 
-    elif text = "7":
+    elif text ==  "7":
         bot.send_message(message.chat.id, "Subhanallohil azim")
     
-    elif text = "8":
+    elif text ==  "8":
         bot.send_message(message.chat.id, "La hawla wa la quwwata illa bilah")
 
-    elif text = "9":
+    elif text ==  "9":
         bot.send_message(message.chat.id, "Allahumma salli ala Muhammad")
 
-    elif text = "10":
+    elif text == "10":
         bot.send_message(message.chat.id, "Hasbiyallohu la ilaha illa Huwa")
     
                                                                        
