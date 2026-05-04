@@ -1,7 +1,6 @@
 import telebot 
 
-bot = 
-telebot.TeleBot("8767281487:AAFKfLIpn9hZ2RtD_wbrs-F2dhGbEfHZKRI")
+bot = telebot.TeleBot("8767281487:AAFKfLIpn9hZ2RtD_wbrs-F2dhGbEfHZKRI")
 
 
 @bot.message_handler(commands= ['start'])
@@ -28,7 +27,7 @@ def handler(message):
     if text ==  "1":
         bot.send_message(message.chat.id,"Subhanalloh")
     elif text == "2":
-        bot.send_message(message.chat.id,"Alhamdulilla")
+        bot.send_message(message.chat.id,"Alhamdulillah")
     elif text ==  "3":
         bot.send_message(message.chat.id,"Allohu Akbar")
     elif text == "4":
@@ -48,7 +47,7 @@ def handler(message):
     else:
         bot.send_message(message.chat.id,"Iltimos 1 dan 10 gacha son yoz")
     
-    bot.polling()
+bot.polling()
                    
 
 
@@ -65,7 +64,7 @@ def handler(message):
     
     
     
-    )
+    
 
 
 
