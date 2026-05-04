@@ -29,7 +29,7 @@ def handler(message):
     elif text == "2":
         bot.send_message(message.chat.id,"Alhamdulillah")
     elif text ==  "3":
-        bot.send_message(message.chat.id,"Allohu Akbar")
+        bot.send_message(message.chat.id,"Allohu Akbar <> ")
     elif text == "4":
         bot.send_message(message.chat.id,"La ilaha illalloh")
     elif  text == "5":
