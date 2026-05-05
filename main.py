@@ -1,14 +1,24 @@
 import telebot
 from telebot import types
 import random
+import sqlite3
 
-TOKEN = "8767281487:AAHOR6OcqP1OP4-bx3sZa7KArbtsy5OXCP4"
+TOKEN = '8767281487:AAHEBRJwawCgP9dmsuCd61yQHMWhL0pIzjE"
 bot = telebot.TeleBot(TOKEN)
 
-# user counter
-user_count = {}
+# DATABASE
+conn = sqlite3.connect("bot.db", check_same_thread=False)
+cursor = conn.cursor()
 
-# zikrlar
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER PRIMARY KEY,
+    count INTEGER
+)
+""")
+conn.commit()
+
+# ZIKRLAR
 zikrlar = {
     "1": "Subhanalloh",
     "2": "Alhamdulillah",
@@ -22,6 +32,22 @@ zikrlar = {
     "10": "Hasbiyallohu la ilaha illa hu"
 }
 
+# USERNI OLISH/YARATISH
+def get_user(user_id):
+    cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,))
+    user = cursor.fetchone()
+
+    if user is None:
+        cursor.execute("INSERT INTO users VALUES (?, ?)", (user_id, 0))
+        conn.commit()
+        return 0
+    return user[0]
+
+# COUNT UPDATE
+def update_count(user_id):
+    cursor.execute("UPDATE users SET count = count + 1 WHERE user_id=?", (user_id,))
+    conn.commit()
+
 # START
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -30,10 +56,17 @@ def start(message):
     markup.add("4", "5", "6")
     markup.add("7", "8", "9", "10")
     markup.add("🎲 Random", "📊 Statistika")
+    markup.add("🛑 Stop")
 
     bot.send_message(
         message.chat.id,
-        "👇 Zikr tanla:",
+        "👋 Assalomu alaykum!\n\n"
+        "📿 Bu Zikr Bot.\n\n"
+        "👇 Quyidagilardan birini tanlang:\n"
+        "• Raqam bosib zikr ayting\n"
+        "• 🎲 Random — tasodifiy zikr\n"
+        "• 📊 Statistika — hisobingiz\n"
+        "• 🛑 Stop — yakunlash",
         reply_markup=markup
     )
 
@@ -43,32 +76,41 @@ def handler(message):
     text = message.text
     user_id = message.from_user.id
 
-    # userni yaratamiz
-    if user_id not in user_count:
-        user_count[user_id] = 0
+    count = get_user(user_id)
 
-    # zikr bosilsa
+    # ZIKR
     if text in zikrlar:
-        user_count[user_id] += 1
+        update_count(user_id)
+        count += 1
 
         bot.send_message(
             message.chat.id,
-            f"✅ {zikrlar[text]}\n\n📿 Soni: {user_count[user_id]}"
+            f"✅ {zikrlar[text]}\n\n📿 Soni: {count}"
         )
 
-    # random
+    # RANDOM
     elif text == "🎲 Random":
         zikr = random.choice(list(zikrlar.values()))
         bot.send_message(message.chat.id, f"🎯 {zikr}")
 
-    # statistika
+    # STATISTIKA
     elif text == "📊 Statistika":
         bot.send_message(
             message.chat.id,
-            f"📊 Siz {user_count[user_id]} ta zikr aytdingiz"
+            f"📊 Siz {count} ta zikr aytdingiz"
+        )
+
+    # STOP
+    elif text == "🛑 Stop":
+        bot.send_message(
+            message.chat.id,
+            f"🤝 Siz {count} ta zikr aytdingiz.\n\n😊 Siz uchun xursandman!"
         )
 
     else:
-        bot.send_message(message.chat.id, "❗ Tugmalardan foydalaning")
+        bot.send_message(
+            message.chat.id,
+            "❗ Iltimos tugmalardan foydalaning"
+        )
 
 bot.polling()
