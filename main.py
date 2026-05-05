@@ -1,4 +1,4 @@
-[06.05.2026 2:47] ..: import telebot
+import telebot
 from telebot import types
 import sqlite3
 import random
