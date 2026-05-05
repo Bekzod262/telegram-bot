@@ -3,7 +3,7 @@ from telebot import types
 import random
 import sqlite3
 
-TOKEN = '8767281487:AAHEBRJwawCgP9dmsuCd61yQHMWhL0pIzjE"
+TOKEN = "8767281487:AAEld5ZnA8OTPtJSDkiZJZ2tjrk5Vk0piH8"
 bot = telebot.TeleBot(TOKEN)
 
 # DATABASE
