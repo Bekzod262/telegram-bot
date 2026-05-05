@@ -3,8 +3,8 @@ from telebot import types
 import sqlite3
 import random
 
-TOKEN = "8767281487:AAFHBVwwPIk_nOed1531S0a2WM_Wlh0Yp5I"
-
+# ===== TOKEN =====
+TOKEN ="8767281487:AAF-dq6zDyKzu2aO7zkN4WFmBLReHtAiDTM"
 bot = telebot.TeleBot(TOKEN)
 
 # ===== DATABASE =====
@@ -39,14 +39,16 @@ def get_user(user_id):
     user = cursor.fetchone()
 
     if not user:
-        cursor.execute("INSERT INTO users (user_id, count) VALUES (?, ?)", (user_id, 0))
+        cursor.execute(
+            "INSERT INTO users (user_id, count) VALUES (?, ?)",
+            (user_id, 0)
+        )
         conn.commit()
 
 # ===== START =====
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-
     markup.add("1", "2", "3")
     markup.add("4", "5", "6")
     markup.add("7", "8", "9", "10")
@@ -66,12 +68,17 @@ def handler(message):
 
     get_user(user_id)
 
-    # ===== ZIKR =====
     if text in zikrlar:
-        cursor.execute("UPDATE users SET count = count + 1 WHERE user_id=?", (user_id,))
+        cursor.execute(
+            "UPDATE users SET count = count + 1 WHERE user_id=?",
+            (user_id,)
+        )
         conn.commit()
 
-        cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,))
+        cursor.execute(
+            "SELECT count FROM users WHERE user_id=?",
+            (user_id,)
+        )
         count = cursor.fetchone()[0]
 
         bot.send_message(
@@ -79,33 +86,39 @@ def handler(message):
             f"📿 {zikrlar[text]}\n\n✅ Soni: {count}"
         )
 
-    # ===== RANDOM =====
     elif text == "🎲 Random":
         zikr = random.choice(list(zikrlar.values()))
         bot.send_message(message.chat.id, f"🎲 {zikr}")
 
-    # ===== STATISTIKA =====
     elif text == "📊 Statistika":
-        cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,))
+        cursor.execute(
+            "SELECT count FROM users WHERE user_id=?",
+            (user_id,)
+        )
         count = cursor.fetchone()[0]
 
         bot.send_message(
             message.chat.id,
-            f"📊 Siz {count} ta zikr aytdingiz\n\n😊 Siz uchun xursandman!"
+            f"📊 Siz {count} ta zikr aytdingiz\n\n😊 Zo‘r!"
         )
 
-    # ===== STOP =====
     elif text == "🛑 Stop":
-        cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,))
+        cursor.execute(
+            "SELECT count FROM users WHERE user_id=?",
+            (user_id,)
+        )
         count = cursor.fetchone()[0]
 
         bot.send_message(
             message.chat.id,
-            f"🛑 To‘xtatildi\n\n📊 Jami: {count}\n\n😊 Siz uchun xursandman!"
+            f"🛑 To‘xtatildi\n\n📊 Jami: {count}"
         )
 
     else:
-        bot.send_message(message.chat.id, "❗ Iltimos tugmalardan foydalaning")
+        bot.send_message(
+            message.chat.id,
+            "❗ Iltimos tugmalardan foydalaning"
+        )
 
 # ===== RUN =====
 print("Bot ishlayapti...")
