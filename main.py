@@ -1,25 +1,13 @@
 import telebot
 from telebot import types
-import sqlite3
 import random
 
 TOKEN = "8767281487:AAEld5ZnA8OTPtJSDkiZJZ2tjrk5Vk0piH8"
-
 bot = telebot.TeleBot(TOKEN)
 
-# ===== DATABASE =====
-conn = sqlite3.connect("zikr.db", check_same_thread=False)
-cursor = conn.cursor()
+# userlar uchun counter
+user_count = {}
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    user_id INTEGER PRIMARY KEY,
-    count INTEGER DEFAULT 0
-)
-""")
-conn.commit()
-
-# ===== ZIKRLAR =====
 zikrlar = {
     "1": "Subhanalloh",
     "2": "Alhamdulillah",
@@ -33,80 +21,47 @@ zikrlar = {
     "10": "Hasbiyallohu la ilaha illa hu"
 }
 
-# ===== USER TEKSHIRISH =====
-def get_user(user_id):
-    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
-    user = cursor.fetchone()
-
-    if not user:
-        cursor.execute("INSERT INTO users (user_id, count) VALUES (?, ?)", (user_id, 0))
-        conn.commit()
-
-# ===== START =====
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add("1","2","3")
+    markup.add("4","5","6")
+    markup.add("7","8","9","10")
+    markup.add("Random","Statistika")
 
-    markup.add("1", "2", "3")
-    markup.add("4", "5", "6")
-    markup.add("7", "8", "9", "10")
-    markup.add("🎲 Random", "📊 Statistika", "🛑 Stop")
+    bot.send_message(message.chat.id, "👇 Zikr tanla:", reply_markup=markup)
 
-    bot.send_message(
-        message.chat.id,
-        "👋 Salom!\n\n📿 Zikr botga xush kelibsiz!\n\n👇 Tanlang:",
-        reply_markup=markup
-    )
 
-# ===== HANDLER =====
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda m: True)
 def handler(message):
-    text = message.text or ""
+    text = message.text
     user_id = message.from_user.id
 
-    get_user(user_id)
+    # user uchun counter ochamiz
+    if user_id not in user_count:
+        user_count[user_id] = 0
 
-    # ===== ZIKR =====
+    # oddiy tanlov
     if text in zikrlar:
-        cursor.execute("UPDATE users SET count = count + 1 WHERE user_id=?", (user_id,))
-        conn.commit()
-
-        cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,))
-        count = cursor.fetchone()[0]
-
+        user_count[user_id] += 1
         bot.send_message(
             message.chat.id,
-            f"📿 {zikrlar[text]}\n\n✅ Soni: {count}"
+            f"{zikrlar[text]} ✅\nSana: {user_count[user_id]}"
         )
 
-    # ===== RANDOM =====
-    elif text == "🎲 Random":
+    # random
+    elif text == "Random":
         zikr = random.choice(list(zikrlar.values()))
         bot.send_message(message.chat.id, f"🎲 {zikr}")
 
-    # ===== STATISTIKA =====
-    elif text == "📊 Statistika":
-        cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,))
-        count = cursor.fetchone()[0]
-
+    # statistika
+    elif text == "Statistika":
         bot.send_message(
             message.chat.id,
-            f"📊 Siz {count} ta zikr aytdingiz\n\n😊 Siz uchun xursandman!"
-        )
-
-    # ===== STOP =====
-    elif text == "🛑 Stop":
-        cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,))
-        count = cursor.fetchone()[0]
-
-        bot.send_message(
-            message.chat.id,
-            f"🛑 To‘xtatildi\n\n📊 Jami: {count}\n\n😊 Siz uchun xursandman!"
+            f"📊 Siz {user_count[user_id]} ta zikr aytdingiz"
         )
 
     else:
-        bot.send_message(message.chat.id, "❗ Iltimos tugmalardan foydalaning")
+        bot.send_message(message.chat.id, "❗ Iltimos tugmadan tanla")
 
-# ===== RUN =====
-print("Bot ishlayapti...")
-bot.polling(none_stop=True)
+bot.polling()
