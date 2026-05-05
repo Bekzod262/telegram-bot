@@ -1,4 +1,4 @@
-import telebot
+ import telebot
 from telebot import types
 import sqlite3
 import random
@@ -76,7 +76,8 @@ def get_user(user_id):
 
 def get_lang(user_id):
     cursor.execute("SELECT lang FROM users WHERE user_id=?", (user_id,))
-    return cursor.fetchone()[0]
+    result = cursor.fetchone()
+    return result[0] if result else "uz"
 
 def set_lang(user_id, lang):
     cursor.execute("UPDATE users SET lang=? WHERE user_id=?", (lang, user_id))
@@ -135,8 +136,7 @@ def handler(message):
 
     elif text == "📊 Statistika":
         count = cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,)).fetchone()[0]
-        bot.send_message(message.chat.id, t(user
-[06.05.2026 2:47] ..: _id,"count", count=count))
+[06.05.2026 2:57] ..: bot.send_message(message.chat.id, t(user_id,"count", count=count))
 
     elif text == "🏆 Top":
         top = cursor.execute("SELECT user_id, count FROM users ORDER BY count DESC LIMIT 5").fetchall()
