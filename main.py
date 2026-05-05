@@ -6,7 +6,7 @@ import threading
 import time
 
 # ===== TOKEN =====
-TOKEN = "8767281487:AAF-dq6zDyKzu2aO7zkN4WFmBLReHtAiDTM"
+TOKEN = "8767281487:AAGk2D65jnvJYFZoyc_V1haLB2zNj5wsYlY"
 bot = telebot.TeleBot(TOKEN)
 
 # ===== DATABASE =====
