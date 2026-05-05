@@ -1,107 +1,67 @@
-import telebot 
+import telebot
+from telebot import types
+import random
 
-bot = telebot.TeleBot("8767281487:AAFKfLIpn9hZ2RtD_wbrs-F2dhGbEfHZKRI")
+TOKEN = "8767281487:AAHXQ3zTPXwfxqoH_ztNzh5ixtPokxhub2Y"
+bot = telebot.TeleBot(TOKEN)
 
+# userlar uchun counter
+user_count = {}
 
-@bot.message_handler(commands= ['start'])
+zikrlar = {
+    "1": "Subhanalloh",
+    "2": "Alhamdulillah",
+    "3": "Allohu Akbar",
+    "4": "La ilaha illalloh",
+    "5": "Astag‘firulloh",
+    "6": "Subhanallohi va bihamdihi",
+    "7": "Subhanallohil azim",
+    "8": "La hawla wa la quwwata illa billah",
+    "9": "Salovat",
+    "10": "Hasbiyallohu la ilaha illa hu"
+}
+
+@bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id,
-    "Salom!\n\n"
-    "1- Subhanalloh\n"
-    "2- Alhamdulillah\n"
-    "3- Allohu Akbar\n"
-    "4- La ilaha illalloh\n"
-    "5- Astaghfirulloh\n"
-    "6- SubhanaLLohi va bihamdihi\n"
-    "7- Subhanallohil azim\n"
-    "8- La hawla wa la quwwata"
-    "9- Salovat\n"
-    "10- Hasbiyallohu la ilaha illa hu")
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add("1","2","3")
+    markup.add("4","5","6")
+    markup.add("7","8","9","10")
+    markup.add("Random","Statistika")
 
-    # har qanday xabarni ushlaydi
+    bot.send_message(message.chat.id, "👇 Zikr tanla:", reply_markup=markup)
 
-@bot.message_handler(func=lambda message: True)
+
+@bot.message_handler(func=lambda m: True)
 def handler(message):
     text = message.text
+    user_id = message.from_user.id
 
-    if text ==  "1":
-        bot.send_message(message.chat.id,"Subhanalloh")
-    elif text == "2":
-        bot.send_message(message.chat.id,"Alhamdulillah")
-    elif text ==  "3":
-        bot.send_message(message.chat.id,"Allohu Akbar <> ")
-    elif text == "4":
-        bot.send_message(message.chat.id,"La ilaha illalloh")
-    elif  text == "5":
-        bot.send_message(message.chat.id, "Astaghfirulloh")
-    elif text == "6":
-        bot.send_message(message.chat.id, "Subhanallohi va bihamdihi")
-    elif text == "7":
-        bot.send_message(message.chat.id, "Subhanallohil azim")
-    elif text == "8":
-        bot.send_message(message.chat.id, "La hawla wa la quwwata illa billah")
-    elif text == "9":
-        bot.send_message(message.chat.id, "Allohumma salli ala Muhamamd")
-    elif text == "10":
-        bot.send_message(message.chat.id, "Hasbiyallohu la ilaha illa hu")
+    # user uchun counter ochamiz
+    if user_id not in user_count:
+        user_count[user_id] = 0
+
+    # oddiy tanlov
+    if text in zikrlar:
+        user_count[user_id] += 1
+        bot.send_message(
+            message.chat.id,
+            f"{zikrlar[text]} ✅\nSana: {user_count[user_id]}"
+        )
+
+    # random
+    elif text == "Random":
+        zikr = random.choice(list(zikrlar.values()))
+        bot.send_message(message.chat.id, f"🎲 {zikr}")
+
+    # statistika
+    elif text == "Statistika":
+        bot.send_message(
+            message.chat.id,
+            f"📊 Siz {user_count[user_id]} ta zikr aytdingiz"
+        )
+
     else:
-        bot.send_message(message.chat.id,"Iltimos 1 dan 10 gacha son yoz")
-    
+        bot.send_message(message.chat.id, "❗ Iltimos tugmadan tanla")
+
 bot.polling()
-                   
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
