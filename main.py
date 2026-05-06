@@ -135,8 +135,8 @@ def handler(message):
         bot.send_message(message.chat.id, f"📿 {zikrlar[text]}\n✅ {count}")
 
     elif text == "📊 Statistika":
-        count = cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,)).fetchone()[0]
-[06.05.2026 2:57] ..: bot.send_message(message.chat.id, t(user_id,"count", count=count))
+        count = cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,)).fetchone()
+        bot.send_message(message.chat.id, t(user_id,"count", count=count))
 
     elif text == "🏆 Top":
         top = cursor.execute("SELECT user_id, count FROM users ORDER BY count DESC LIMIT 5").fetchall()
