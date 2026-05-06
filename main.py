@@ -6,7 +6,7 @@ import threading
 import time
 
 # ===== CONFIG =====
-TOKEN =  "8767281487:AAFY_jdwXxANzda3eU2xPGd1WWP1hqZpZ-E"
+TOKEN = "8767281487:AAFY_jdwXxANzda3eU2xPGd1WWP1hqZpZ-E"
 DB_NAME = "zikr.db"
 REMINDER_INTERVAL = 3600
 
@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
     lang TEXT DEFAULT 'uz'
 )
 """)
+
 conn.commit()
 
 # ===== TEXTS =====
@@ -38,6 +39,7 @@ TEXTS = {
         "use_buttons": "❗ Tugmalardan foydalan",
         "reminder_msg": "🔔 Zikr aytishni unutmang 📿"
     },
+
     "en": {
         "welcome": "👋 Hello!\n📿 Welcome to Zikr Bot!",
         "choose_lang": "🌐 Choose language:",
@@ -46,7 +48,7 @@ TEXTS = {
         "reminder_on": "🔔 Reminder enabled",
         "reminder_off": "🔕 Reminder disabled",
         "use_buttons": "❗ Use buttons",
-        "reminder_msg": "🔔 Don't forget to do zikr 📿"
+        "reminder_msg": "🔔 Don't forget zikr 📿"
     }
 }
 
@@ -66,114 +68,243 @@ zikrlar = {
 
 # ===== FUNCTIONS =====
 def get_user(user_id):
-    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
-    if not cursor.fetchone():
-        cursor.execute(
-            "INSERT INTO users (user_id, count, reminder, lang) VALUES (?, 0, 0, 'uz')",
-            (user_id,)
-        )
+    cursor.execute(
+        "SELECT user_id FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
+    if cursor.fetchone() is None:
+        cursor.execute("""
+        INSERT INTO users (user_id, count, reminder, lang)
+        VALUES (?, 0, 0, 'uz')
+        """, (user_id,))
+
         conn.commit()
 
+
 def get_lang(user_id):
-    cursor.execute("SELECT lang FROM users WHERE user_id=?", (user_id,))
+    cursor.execute(
+        "SELECT lang FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
     result = cursor.fetchone()
-    return result[0] if result else "uz"
+
+    if result:
+        return result[0]
+
+    return "uz"
+
 
 def set_lang(user_id, lang):
-    cursor.execute("UPDATE users SET lang=? WHERE user_id=?", (lang, user_id))
+    cursor.execute(
+        "UPDATE users SET lang=? WHERE user_id=?",
+        (lang, user_id)
+    )
+
     conn.commit()
+
 
 def t(user_id, key, **kwargs):
     lang = get_lang(user_id)
     return TEXTS[lang][key].format(**kwargs)
 
+
 def keyboard():
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.add("1","2","3")
-    kb.add("4","5","6")
-    kb.add("7","8","9","10")
-    kb.add("🎲 Random","📊 Statistika")
-    kb.add("🏆 Top","🔔 Reminder ON","🔕 Reminder OFF")
-    kb.add("🌐 Language")
+
+    kb.row("1", "2", "3")
+    kb.row("4", "5", "6")
+    kb.row("7", "8", "9", "10")
+
+    kb.row("🎲 Random", "📊 Statistika")
+    kb.row("🏆 Top")
+    kb.row("🔔 Reminder ON", "🔕 Reminder OFF")
+    kb.row("🌐 Language")
+
     return kb
 
-def lang_kb():
+
+def lang_keyboard():
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.add("🇺🇿 Uzbek","🇬🇧 English")
+
+    kb.row("🇺🇿 Uzbek", "🇬🇧 English")
+
     return kb
+
+
+# ===== REMINDER THREAD =====
+def reminder_loop():
+    while True:
+        time.sleep(REMINDER_INTERVAL)
+
+        cursor.execute(
+            "SELECT user_id, lang FROM users WHERE reminder=1"
+        )
+
+        users = cursor.fetchall()
+
+        for user_id, lang in users:
+            try:
+                bot.send_message(
+                    user_id,
+                    TEXTS[lang]["reminder_msg"]
+                )
+
+            except:
+                pass
+
+
+threading.Thread(
+    target=reminder_loop,
+    daemon=True
+).start()
+
 
 # ===== START =====
 @bot.message_handler(commands=['start'])
 def start(message):
-    get_user(message.from_user.id)
-    bot.send_message(message.chat.id, TEXTS["uz"]["choose_lang"], reply_markup=lang_kb())
-
-# ===== HANDLER =====
-@bot.message_handler(func=lambda m: True)
-def handler(message):
     user_id = message.from_user.id
-    text = message.text or ""
 
     get_user(user_id)
 
+    bot.send_message(
+        message.chat.id,
+        TEXTS["uz"]["choose_lang"],
+        reply_markup=lang_keyboard()
+    )
+
+
+# ===== MAIN HANDLER =====
+@bot.message_handler(func=lambda message: True)
+def handler(message):
+    user_id = message.from_user.id
+    text = message.text
+
+    get_user(user_id)
+
+    # ===== LANGUAGE =====
     if text == "🇺🇿 Uzbek":
         set_lang(user_id, "uz")
-        bot.send_message(message.chat.id, t(user_id,"welcome"), reply_markup=keyboard())
+
+        bot.send_message(
+            message.chat. id,
+            t(user_id, "welcome"),
+            reply_markup=keyboard()
+        )
 
     elif text == "🇬🇧 English":
         set_lang(user_id, "en")
-        bot.send_message(message.chat.id, t(user_id,"welcome"), reply_markup=keyboard())
+
+        bot.send_message(
+            message.chat.id,
+            t(user_id, "welcome"),
+            reply_markup=keyboard()
+        )
 
     elif text == "🌐 Language":
-        bot.send_message(message.chat.id, t(user_id,"choose_lang"), reply_markup=lang_kb())
+        bot.send_message(
+            message.chat.id,
+            t(user_id, "choose_lang"),
+            reply_markup=lang_keyboard()
+        )
 
-    elif text in zikrlar:
-        cursor.execute("UPDATE users SET count=count+1 WHERE user_id=?", (user_id,))
-        conn.commit()
-
-        count = cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,)).fetchone()[0]
-        bot.send_message(message.chat.id, f"📿 {zikrlar[text]}\n✅ {count}")
-
-    elif text == "📊 Statistika":
-        count = cursor.execute("SELECT count FROM users WHERE user_id=?", (user_id,)).fetchone()
-        bot.send_message(message.chat.id, t(user_id,"count", count=count))
-
-    elif text == "🏆 Top":
-        top = cursor.execute("SELECT user_id, count FROM users ORDER BY count DESC LIMIT 5").fetchall()
-        msg = t(user_id,"top")
-        for i, u in enumerate(top, 1):
-            msg += f"{i}. ID:{u[0]} — {u[1]}\n"
-        bot.send_message(message.chat.id, msg)
-
-    elif text == "🔔 Reminder ON":
-        cursor.execute("UPDATE users SET reminder=1 WHERE user_id=?", (user_id,))
-        conn.commit()
-        bot.send_message(message.chat.id, t(user_id,"reminder_on"))
-
-    elif text == "🔕 Reminder OFF":
-        cursor.execute("UPDATE users SET reminder=0 WHERE user_id=?", (user_id,))
-        conn.commit()
-        bot.send_message(message.chat.id, t(user_id,"reminder_off"))
-
+    # ===== RANDOM =====
     elif text == "🎲 Random":
-        bot.send_message(message.chat.id, "🎲 " + random.choice(list(zikrlar.values())))
+        random_zikr = random.choice(list(zikrlar.values()))
 
+        bot.send_message(
+            message.chat.id,
+            f"🎲 {random_zikr}"
+        )
+
+    # ===== ZIKR =====
+    elif text in zikrlar:
+        cursor.execute(
+            "UPDATE users SET count=count+1 WHERE user_id=?",
+            (user_id,)
+        )
+
+        conn.commit()
+
+        count = cursor.execute(
+            "SELECT count FROM users WHERE user_id=?",
+            (user_id,)
+        ).fetchone()[0]
+
+        bot.send_message(
+            message.chat.id,
+            f"📿 {zikrlar[text]}\n\n✅ {count}"
+        )
+
+    # ===== STATISTIKA =====
+    elif text == "📊 Statistika":
+        count = cursor.execute(
+            "SELECT count FROM users WHERE user_id=?",
+            (user_id,)
+        ).fetchone()[0]
+
+        bot.send_message(
+            message.chat.id,
+            t(user_id, "count", count=count)
+        )
+
+    # ===== TOP =====
+    elif text == "🏆 Top":
+        top_users = cursor.execute("""
+        SELECT user_id, count
+        FROM users
+        ORDER BY count DESC
+        LIMIT 5
+        """).fetchall()
+
+        msg = t(user_id, "top")
+
+        for i, user in enumerate(top_users, start=1):
+            msg += f"\n{i}. ID: {user[0]} — {user[1]}"
+
+        bot.send_message(
+            message.chat.id,
+            msg
+        )
+
+    # ===== REMINDER ON =====
+    elif text == "🔔 Reminder ON":
+        cursor.execute(
+            "UPDATE users SET reminder=1 WHERE user_id=?",
+            (user_id,)
+        )
+
+        conn.commit()
+
+        bot.send_message(
+            message.chat.id,
+            t(user_id, "reminder_on")
+        )
+
+    # ===== REMINDER OFF =====
+    elif text == "🔕 Reminder OFF":
+        cursor.execute(
+            "UPDATE users SET reminder=0 WHERE user_id=?",
+            (user_id,)
+        )
+
+        conn.commit()
+
+        bot.send_message(
+            message.chat.id,
+            t(user_id, "reminder_off")
+        )
+
+    # ===== UNKNOWN =====
     else:
-        bot.send_message(message.chat.id, t(user_id,"use_buttons"))
+        bot.send_message(
+            message.chat.id,
+            t(user_id, "use_buttons")
+        )
 
-# ===== REMINDER =====
-def reminder():
-    while True:
-        users = cursor.execute("SELECT user_id FROM users WHERE reminder=1").fetchall()
-        for u in users:
-            try:
-                bot.send_message(u[0], t(u[0], "reminder_msg"))
-            except:
-                pass
-        time.sleep(REMINDER_INTERVAL)
-
-threading.Thread(target=reminder, daemon=True).start()
 
 # ===== RUN =====
-print("Bot ishlayapti...")
+print("Bot ishga tushdi...")
+
 bot.infinity_polling()
