@@ -6,7 +6,7 @@ import threading
 import time
 
 # ===== CONFIG =====
-TOKEN =  "8767281487:AAFY_jdwXxANzda3eU2xPGd1WWP1hqZpZ-E"
+TOKEN = "8767281487:AAFY_jdwXxANzda3eU2xPGd1WWP1hqZpZ-E"
 DB_NAME = "zikr.db"
 REMINDER_INTERVAL = 3600
 
