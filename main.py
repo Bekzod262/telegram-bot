@@ -1,4 +1,4 @@
-import telebot
+[06.05.2026 11:29] ..: import telebot
 from telebot import types
 import sqlite3
 import random
@@ -6,7 +6,7 @@ import threading
 import time
 
 # ===== CONFIG =====
-TOKEN = "8767281487:AAFY_jdwXxANzda3eU2xPGd1WWP1hqZpZ-E"
+TOKEN =  "8767281487:AAFY_jdwXxANzda3eU2xPGd1WWP1hqZpZ-E"
 DB_NAME = "zikr.db"
 REMINDER_INTERVAL = 3600
 
@@ -133,7 +133,7 @@ def lang_keyboard():
     return kb
 
 
-# ===== REMINDER THREAD =====
+# ===== REMINDER =====
 def reminder_loop():
     while True:
         time.sleep(REMINDER_INTERVAL)
@@ -178,6 +178,7 @@ def start(message):
 # ===== MAIN HANDLER =====
 @bot.message_handler(func=lambda message: True)
 def handler(message):
+
     user_id = message.from_user.id
     text = message.text
 
@@ -185,15 +186,17 @@ def handler(message):
 
     # ===== LANGUAGE =====
     if text == "🇺🇿 Uzbek":
+
         set_lang(user_id, "uz")
 
         bot.send_message(
-            message.chat. id,
+            message.chat.id,
             t(user_id, "welcome"),
             reply_markup=keyboard()
         )
 
     elif text == "🇬🇧 English":
+
         set_lang(user_id, "en")
 
         bot.send_message(
@@ -203,6 +206,7 @@ def handler(message):
         )
 
     elif text == "🌐 Language":
+
         bot.send_message(
             message.chat.id,
             t(user_id, "choose_lang"),
@@ -211,7 +215,10 @@ def handler(message):
 
     # ===== RANDOM =====
     elif text == "🎲 Random":
-        random_zikr = random.choice(list(zikrlar.values()))
+
+        random_zikr = random.choice(
+            list(zikrlar.values())
+        )
 
         bot.send_message(
             message.chat.id,
@@ -220,6 +227,7 @@ def handler(message):
 
     # ===== ZIKR =====
     elif text in zikrlar:
+
         cursor.execute(
             "UPDATE users SET count=count+1 WHERE user_id=?",
             (user_id,)
@@ -239,6 +247,7 @@ def handler(message):
 
     # ===== STATISTIKA =====
     elif text == "📊 Statistika":
+
         count = cursor.execute(
             "SELECT count FROM users WHERE user_id=?",
             (user_id,)
@@ -251,6 +260,7 @@ def handler(message):
 
     # ===== TOP =====
     elif text == "🏆 Top":
+
         top_users = cursor.execute("""
         SELECT user_id, count
         FROM users
@@ -270,6 +280,7 @@ def handler(message):
 
     # ===== REMINDER ON =====
     elif text == "🔔 Reminder ON":
+
         cursor.execute(
             "UPDATE users SET reminder=1 WHERE user_id=?",
             (user_id,)
@@ -284,6 +295,7 @@ def handler(message):
 
     # ===== REMINDER OFF =====
     elif text == "🔕 Reminder OFF":
+
         cursor.execute(
             "UPDATE users SET reminder=0 WHERE user_id=?",
             (user_id,)
@@ -298,6 +310,7 @@ def handler(message):
 
     # ===== UNKNOWN =====
     else:
+
         bot.send_message(
             message.chat.id,
             t(user_id, "use_buttons")
