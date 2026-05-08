@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-balans = 1234
+balans = 1100
 savat = []
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
