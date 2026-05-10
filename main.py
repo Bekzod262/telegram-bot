@@ -1,31 +1,36 @@
-from telegram.ext import * # kod boshlanishi ekan demak bekzod >>>>>>>>>>>>lets start bekzod 
- #kichik kichik kichik mufaqatla katda galabalaga ollib keladi demak dustlarim
+from telegram.ext import *
+
 async def start(update, context):
-# async def start(update, context): funksiya and enternet kutadi va qilla olladi demak bekzod lets start bekzod
-    await update.message.reply_text("Salom 🙂")
-    await update.message.reply_text("Ismingizni kiriting:")
-
-async def chat(update, context):
-
-    ism = update.message.text # input urnini bosadi demak bekzod 
-# ism kirit deyabmiz demak  bekzod lets start bekzod (///////////>>>>>>><<<<<<<//////////)
-    await update.message.reply_text(
-         f"Salom {ism} aka 😎 Qalaysiz?"
-         )
-
-async def chat(update, context):
-
-    age = update.message.text 
 
     await update.message.reply_text(
-        f"Sizning yoshingiz{age} aka 
-    siz zurisiz okam "
+        "Salom \nIsmingiz nima? "
     )
 
-app = ApplicationBuilder().token("8767281487:AAG6T40XHhfpmvf4g4tpyIU6BPMUphx0kmc").build()
+async def chat(update, context):
+
+    text = update.message.text
+
+    await update.message.reply_text(
+        f"Voyy {text} juda zor ism ekan!"
+    )
+
+    await update.message.reply_text(
+        f"{text} aka yoshingiz nechida ?"
+    )
+
+    await update.message.reply_text(
+        "qanday ish qilasiz? "
+    )
+
+    await update.message.reply_text(
+        "siz juda zor odamsiz okam
+        "
+    )
+app = 
+ApplicationBuilder().token("8767281487:AAG6T40XHhfpmvf4g4tpyIU6BPMUphx0kmc").build()
 
 app.add_handler(CommandHandler("start", start))
+
 app.add_handler(MessageHandler(filters.TEXT, chat))
 
 app.run_polling()
-    
