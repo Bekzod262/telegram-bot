@@ -10,13 +10,14 @@ async def chat(update, context):
     ism = update.message.text # input urnini bosadi demak bekzod 
 # ism kirit deyabmiz demak  bekzod lets start bekzod (///////////>>>>>>><<<<<<<//////////)
     await update.message.reply_text(
-        f"Salom {ism} aka 😎 Qalaysiz?")
+         f"Salom {ism} aka 😎 Qalaysiz?")
 
 async def chat(update, context):
 
     age = update.message.text 
 
-    await update.message.reply_text(f"Sizning yoshingiz{age} aka 
+    await update.message.reply_text(
+        f"Sizning yoshingiz{age} aka 
     siz zurisiz okam ")
 
 app = ApplicationBuilder().token("8767281487:AAG6T40XHhfpmvf4g4tpyIU6BPMUphx0kmc").build()
