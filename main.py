@@ -33,8 +33,8 @@ async def chat(update, context):
     else:
         await update.message.reply_text("Tushunmadim")
 
-app = 
-ApplicationBuilder().token("8767281487:AAG6T40XHhfpmvf4g4tpyIU6BPMUphx0kmc").build()
+app= 
+ApplicationBuilder().token("8767281487:AAG6T40XHhfpmvf4g4tpyIU6BPMUphx0kmc").build(s
 
 app.add_handler(CommandHandler("start",start))
 
