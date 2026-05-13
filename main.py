@@ -6,7 +6,7 @@ balanslar = {}
 # START
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.chat_id
-    balanslar[user_id] = 1200
+    balanslar[user_id] = 2000
 
     await update.message.reply_text(
         f"Assalomu alleykum {update.message.from_user.first_name}\n"
