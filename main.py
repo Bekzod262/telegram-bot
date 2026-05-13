@@ -1,45 +1,86 @@
-from telegram.ext import *
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-async def start(update, context):
+balanslar = {}
+
+# START
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.chat_id
+    balanslar[user_id] = 1500
 
     await update.message.reply_text(
-        "Salom 😎\n"
-        "Ismingiz nima?"
+        f"Assalomu alleykum {update.message.from_user.first_name}\n"
+        f"Mini Market botga xush kelibsiz 😎\n\n"
+        f"1 - Tovarlar\n"
+        f"2 - Balans\n"
+        f"3 - Balans qo‘shish\n"
+        f"4 - Balans ayirish\n"
+        f"5 - Market haqida"
     )
 
-async def chat(update, context):
-
+# MESSAGE
+async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.chat_id
     text = update.message.text
 
-    # agar ism yozsa
-    if text.isalpha():
+    if user_id not in balanslar:
+        balanslar[user_id] = 1500
 
+    # 1
+    if text == "1":
         await update.message.reply_text(
-            f"Salom {text} aka 😎\n"
-            f"{text} aka qalaysiz 🔥\n"
-            "Yoshingiz nechida? 🤔"
+            "Tovarlar:\n"
+            "Kepka\n"
+            "Futbolka\n"
+            "Marojni\n"
+            "Komputer\n"
+            "Telfone\n"
+            "Ruchka"
         )
 
-    # agar yosh yozsa
-    elif text.isdigit():
-
+    # 2
+    elif text == "2":
         await update.message.reply_text(
-            f"Voyy 😄 {text} yosh ekansiz\n"
-            "Yoshingiz juda zor ekan 🔥\n"
-            "Siz kuchli odamsiz 😎\n"
-            "Nima ish qilasiz? 👀"
+            f"Sizning balansingiz: {balanslar[user_id]}"
         )
 
-    # boshqa narsa yozsa
+    # 3
+    elif text.startswith("3 "):
+        summa = int(text.split()[1])
+        balanslar[user_id] += summa
+
+        await update.message.reply_text(
+            f"{summa} qo‘shildi ✅\n"
+            f"Yangi balans: {balanslar[user_id]}"
+        )
+
+    # 4
+    elif text.startswith("4 "):
+        summa = int(text.split()[1])
+        balanslar[user_id] -= summa
+
+        await update.message.reply_text(
+            f"{summa} ayirildi ❌\n"
+            f"Yangi balans: {balanslar[user_id]}"
+        )
+
+    # 5
+    elif text == "5":
+        await update.message.reply_text(
+            "Bizning market eng zo‘r market jigar 😎🔥"
+        )
+
     else:
-
         await update.message.reply_text(
-            "Tushunmadim 😅"
+            "Noto‘g‘ri buyruq 😅"
         )
 
-app = ApplicationBuilder().token("8767281487:AAG6T40XHhfpmvf4g4tpyIU6BPMUphx0km").build()
+# MAIN
+app = Application.builder().token("8767281487:AAG6T40XHhfpmvf4g4tpyIU6BPMUphx0kmc").build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT, chat))
+app.add_handler(MessageHandler(filters.TEXT, message_handler))
+
+print("Bot ishga tushdi 😎")
 
 app.run_polling()
