@@ -24,7 +24,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
 
     if user_id not in balanslar:
-        balanslar[user_id] = 1000
+        balanslar[user_id] = 1200
 
     # 1
     if text == "1":
