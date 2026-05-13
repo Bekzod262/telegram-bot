@@ -46,7 +46,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # 3
     elif text.startswith("3 "):
-        summa = int(text.split()[1])
+        summa = int(text.split()[3])
         balanslar[user_id] += summa
 
         await update.message.reply_text(
